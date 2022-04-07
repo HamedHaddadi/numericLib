@@ -42,21 +42,14 @@ bool computeCholesky(Matrix2D<T> & L, Matrix2D<T> & A, const std::size_t & size)
 }
 
 template <typename T>
-auto choleskyDecomposition(Matrix2D<T> & A) {
+requires std::is_floating_point<T>::value
+std::pair<bool, Matrix2D<T>> choleskyDecomposition(Matrix2D<T> & A) {
     TIME_THIS();
     std::size_t size = std::get<0>(A.getShape());
     bool isPositiveDefinite{true};
-    if constexpr (std::is_integral<T>::value) {
-        Matrix2D<double> L(size, size);
-        isPositiveDefinite = computeCholesky(L, A, size);
-        return std::make_pair(isPositiveDefinite, L);
-    }
-    else if constexpr (std::is_floating_point<T>::value) {
-        Matrix2D<T> L(size, size);
-        isPositiveDefinite = computeCholesky(L, A, size);
-        return std::make_pair(isPositiveDefinite, L);
-    }
-
+    Matrix2D<T> L(size, size);
+    isPositiveDefinite = computeCholesky(L, A, size);
+    return std::make_pair(isPositiveDefinite, L);
 }
 
 # endif 

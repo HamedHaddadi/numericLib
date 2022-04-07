@@ -15,11 +15,19 @@ template <typename T>
 Matrix1D<T> operator+(const Matrix1D<T> &, const Matrix1D<T> &);
 
 template <typename T>
+Matrix1D<T> operator-(const Matrix1D<T> &, const Matrix1D<T> &);
+
+
+template <typename T>
 class Matrix1D {
     private:
         std::size_t size_{0};
         std::vector<T> matrix_;
     public:
+        using matrixType = T;
+        inline static constexpr int Dim{1};
+        inline static constexpr bool FixedSize{false}; 
+        inline static constexpr bool linearized{true};        
         Matrix1D() = default;
         Matrix1D(std::size_t);
         Matrix1D(std::vector<T>);
@@ -32,6 +40,7 @@ class Matrix1D {
         // math operator
         friend T dot <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend Matrix1D<T> operator+ <T> (const Matrix1D<T> &, const Matrix1D<T> &);
+        friend Matrix1D<T> operator- <T> (const Matrix1D<T> &, const Matrix1D<T> &);
 };
 
 template <typename T>
@@ -93,5 +102,13 @@ Matrix1D<T> operator+(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
     std::transform(matOne.matrix_.begin(), matOne.matrix_.end(), matTwo.matrix_.begin(), sumResults.matrix_.begin(), std::plus<T>());
     return sumResults;
 }
+
+template <typename T>
+Matrix1D<T> operator-(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
+    Matrix1D<T> minusResults(matOne.size_);
+    std::transform(matOne.matrix_.begin(), matOne.matrix_.end(), matTwo.matrix_.begin(), minusResults.matrix_.begin(), std::minus<T>());
+    return minusResults;    
+}
+
 
 # endif 

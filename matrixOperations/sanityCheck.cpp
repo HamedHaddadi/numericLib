@@ -5,6 +5,18 @@
 # include "../arrays/arrayND.h"
 # include "../linearSystems/luSolvers.h"
 # include "../linearSystems/choleskyDecomposition.h"
+# include "../utils/tester.h" 
+
+
+int addThis (int & a, int & b) {
+    int c{};
+    c = a + b;
+    return c;
+}
+
+std::pair<int, int> justReturn(int & a, int & b) {
+    return std::make_pair(a, b);
+}
 
 int main() {
 
@@ -39,12 +51,13 @@ int main() {
     A.fillRandom(-2, 14);
     Matrix1D<double> b_ans = std::get<1>(gaussianElimination(A, b));
     Matrix2D<double> A_ans = std::get<0>(gaussianElimination(A, b));
+    gaussianElimination(A, b);
     std::cout <<"A ans is "<<std::endl;
-    std::cout << A_ans<<std::endl;
+    std::cout << A<<std::endl;
     std::cout <<"b ans is "<<std::endl;
-    std::cout <<b_ans <<std::endl;
+    std::cout <<b <<std::endl;
 
-    std::cout <<"testinh Cholesky decomposition on a positive definite array" <<std::endl;
+    std::cout <<"testing Cholesky decomposition on a positive definite array" <<std::endl;
     Matrix2D<double> cholTest(3,3);
     cholTest.inputFromString("4 12 -16 12 37 -43 -16 -43 98");
     std::pair<bool, Matrix2D<double> > results = choleskyDecomposition(cholTest);
@@ -52,6 +65,9 @@ int main() {
         std::cout <<"cholesky exist "<<std::endl;
     std::cout <<"lower diagonal matrix is "<<std::endl;
     std::cout <<results.second;
+
+    std::cout <<"testing tester class "<<std::endl;
+    TestFunction<std::pair<bool, Matrix2D<double>>, Matrix2D<double>, Matrix2D<double>> testThis(cholTest, &choleskyDecomposition<double>);
 
     return 0;
 }

@@ -20,6 +20,8 @@
 # include <string>
 # include <sstream>
 # include <chrono>
+# include <functional>
+
 # include "timer.h"
 
 # define USE_TIMER true

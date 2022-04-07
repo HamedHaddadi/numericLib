@@ -77,7 +77,6 @@ std::pair<Matrix2D<T>, Matrix1D<T>> gaussianElimination(Matrix2D<T> A, Matrix1D<
             b(i) = b(i) - iRC*b(i);
         }
     } 
-
     b(size - 1) = b(size - 1)/A(size - 1,size - 1);
     for (std::size_t k = size - 2; k > 0; k--) {
         for (std::size_t j = k + 1; j < size; j++)
