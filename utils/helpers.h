@@ -82,4 +82,9 @@ void lowerInit(std::vector< std::vector<T> > & matrix, std::size_t row, std::siz
         }
 }
 
+template <int I, typename ...Types>
+decltype(auto) getFromTuple(Types&&... elements) {
+    return std::get<I>(std::forward_as_tuple(elements...));
+}
+
 # endif 

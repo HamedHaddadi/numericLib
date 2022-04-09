@@ -20,6 +20,7 @@ std::pair<int, int> justReturn(int & a, int & b) {
 
 int main() {
 
+/*
     std::cout <<"comparing basic recursive determinant between linearized arrayND and Matrix2D ... "<<std::endl;
     std::cout <<" matrix2D >>>>"<<std::endl;
     Matrix2D<double> matOne(10,10);
@@ -56,6 +57,7 @@ int main() {
     std::cout << A<<std::endl;
     std::cout <<"b ans is "<<std::endl;
     std::cout <<b <<std::endl;
+    */
 
     std::cout <<"testing Cholesky decomposition on a positive definite array" <<std::endl;
     Matrix2D<double> cholTest(3,3);
@@ -68,6 +70,7 @@ int main() {
 
     std::cout <<"testing tester class "<<std::endl;
     TestFunction<std::pair<bool, Matrix2D<double>>, Matrix2D<double>, Matrix2D<double>> testThis(cholTest, &choleskyDecomposition<double>);
+    testThis.addFixture("../testFixtures/cholesky3by3.dat", 3, 3);
 
     return 0;
 }
