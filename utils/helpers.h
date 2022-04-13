@@ -87,4 +87,33 @@ decltype(auto) getFromTuple(Types&&... elements) {
     return std::get<I>(std::forward_as_tuple(elements...));
 }
 
+// useful methods for binary comparisons
+template <typename T>
+bool binaryComparison(T elemOne, T elemTwo) {
+
+    if constexpr (std::is_integral<T>::value) {
+        if (elemOne == elemTwo)
+            return true;
+        else
+            return false;
+    }
+    else if constexpr (std::is_floating_point<T>::value) {
+        T epsilon_{T(1e-6)};
+        if (std::fabs(elemOne - elemTwo) <= epsilon_)
+            return true;
+        else
+            return false;
+    }
+
+}
+
+template <typename U, typename W>
+bool binaryComparison(U elemOne, W elemTwo) {
+    double epsilon_{1e-6};
+    if (std::fabs(static_cast<double>(elemOne) - static_cast<double>(elemTwo)) <= epsilon_)
+        return true;
+    else    
+        return false;
+}
+
 # endif 

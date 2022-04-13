@@ -9,13 +9,23 @@
 template <typename ReturnType, typename Matrix, typename... InputArgs>
 
 class TestFunction {
+    /* 
+    Class runs several tests using several fixture on a specific function
+    Adding tests of various functions to an instance of this is class is not supported
+    */
 
     public:
+        TestFunction() = default;
         TestFunction(InputArgs... args, std::function<ReturnType(InputArgs& ...)> testFunction):
-            inputs_(std::forward_as_tuple(args...)), testFunction_{testFunction}{};
+            testFunction_{testFunction} {
+            inputs_.push_back(std::forward_as_tuple(args...));
+        }
         
         template <typename... Inputs>
         TestFunction& addFixture(const std::string &, Inputs&&...);
+        // add more arrays to test; fixtures must be added accordingly
+        TestFunction& addTest(InputArgs... args);
+        TestFunction& addTest(InputArgs... args, std::function<ReturnType(InputArgs& ...)>);
 
         static std::unique_ptr<Matrix> read1DMatrix(const std::string &, auto);        
         static std::unique_ptr<Matrix> read2DMatrix(const std::string &, auto, auto);
@@ -23,17 +33,30 @@ class TestFunction {
         void run();
     
     private:
-        std::tuple<InputArgs&...> inputs_;
-        ReturnType outputs_;
+        std::vector<std::tuple<InputArgs&...>> inputs_;
+        std::vector<ReturnType> outputs_;
         std::function<ReturnType(InputArgs& ...)> testFunction_;
         std::vector<Matrix> fixtures_;
 };
 
 template <typename ReturnType, typename Matrix, typename... InputArgs>
 void TestFunction<ReturnType, Matrix, InputArgs...>::run() {
-    ReturnType outputs = std::apply(testFunction_, inputs_);
+    for (auto testNum  = 0; testNum < inputs_.size(); ++testNum)
+        outputs_.push_back(std::apply(testFunction_, inputs_.at(testNum)));
 }
 
+template <typename ReturnType, typename Matrix, typename ...InputArgs>
+TestFunction<ReturnType, Matrix, InputArgs...>& TestFunction<ReturnType, Matrix, InputArgs...>::addTest(InputArgs ... args) {
+    inputs_.push_back(std::forward_as_tuple(args...));
+    return *this;
+}
+
+template <typename ReturnType, typename Matrix, typename ...InputArgs>
+TestFunction<ReturnType, Matrix, InputArgs...>& TestFunction<ReturnType, Matrix, InputArgs...>::addTest(InputArgs ... args, std::function<ReturnType(InputArgs& ...)> newFunction) {
+    inputs_.push_back(std::forward_as_tuple(args ...));
+    testFunction_ = newFunction;
+    return *this;
+}
 
 template <typename ReturnType, typename Matrix, typename... InputArgs>
 template <typename... Inputs>
@@ -99,6 +122,5 @@ std::unique_ptr<Matrix> TestFunction<ReturnType, Matrix, InputArgs...>::read2DMa
     }
     return std::move(fixture);
 }
-
 
 # endif 

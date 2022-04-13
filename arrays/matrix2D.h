@@ -26,6 +26,19 @@ Matrix2D<T>&& operator-(Matrix2D<T> &&, const Matrix2D<T> &);
 template<typename T>
 Matrix2D<T>&& operator-(Matrix2D<T> &&, Matrix2D<T> &&);
 
+// binary comparison operators
+template <typename T>
+bool operator==(const Matrix2D<T> &, const Matrix2D<T> &);
+
+template <typename U, typename W>
+bool operator==(const Matrix2D<U> &, const Matrix2D<W> &);
+
+template <typename T>
+bool sameShape(const Matrix2D<T> &, const Matrix2D<T> &);
+
+template <typename U, typename W>
+bool sameShape(const Matrix2D<U> &, const Matrix2D<W> &);
+
 // x using Strassen for square (N x N) matrices with N % 2 = 0
 template<typename U, typename W>
 Matrix2D<std::common_type_t<U, W>> operator*(const Matrix2D<U> &, const Matrix2D<W> &);
@@ -43,15 +56,15 @@ std::ofstream& operator<<(std::ofstream &, const Matrix2D<T> &);
 template <typename T>
 std::ostream&  operator<<(std::ostream &, const Matrix2D<T> &);
 
-
+// Class declarations
 template <typename T>
 class Matrix2D {
 
     protected:
         std::size_t row_{0}, col_{0};
         std::vector< std::vector<T> > matrix_;
-        typename std::vector< std::vector<T> >::iterator rowIter_;
-        typename std::vector<T>::iterator colIter_;    
+        typedef typename std::vector< std::vector<T> >::iterator rowIter_;
+        typedef typename std::vector<T>::iterator colIter_;    
 
     public:
         using matrixType = T;
@@ -65,7 +78,18 @@ class Matrix2D {
         Matrix2D& operator=(Matrix2D && src) noexcept;
         Matrix2D(const Matrix2D<T> &) = default;
         Matrix2D(Matrix2D<T> &&) noexcept;
-        virtual ~Matrix2D() = default;        
+        virtual ~Matrix2D() = default;   
+        // binary relational operators 
+        friend bool operator== <T> (const Matrix2D<T> &, const Matrix2D<T> &);
+        
+        template <typename U, typename W>
+        friend bool operator==(const Matrix2D<U> &, const Matrix2D<W> &);
+
+        friend bool sameShape(const Matrix2D<T> &, const Matrix2D<T> &);
+
+        template <typename U, typename W>
+        friend bool sameShape(const Matrix2D<U> &, const Matrix2D<W> &);
+
         // +
         friend Matrix2D<T> operator+ <T> (const Matrix2D<T> &, const Matrix2D<T> &);
         friend Matrix2D<T>&& operator+ <T> (const Matrix2D<T> &, Matrix2D<T> &&);
@@ -115,7 +139,7 @@ class Matrix2D {
         static T recursiveDeterminant(const std::vector<std::vector<T> > &, std::size_t);
         static std::unique_ptr<std::vector< std::vector<T> > > coFactor(const std::vector< std::vector<T>> &, 
             std::size_t, std::size_t, std::size_t);
-
+                
 };
 
 template <typename T>
@@ -158,6 +182,58 @@ template <typename T>
 T& Matrix2D<T>::operator()(std::size_t i, std::size_t j) {
     return matrix_.at(i).at(j);
 }
+
+// overloaded operators
+template <typename T>
+bool sameShape(const Matrix2D<T> & matOne, const Matrix2D<T> & matTwo) {
+    if ((matOne.row_ == matTwo.row) && (matOne.col_ == matTwo.col_))
+        return true;
+    else
+        return false;
+}
+
+template <typename U, typename W>
+bool sameShape(const Matrix2D<U> & matOne, const Matrix2D<W> & matTwo) {
+    if ((matOne.row_ == matTwo.row) && (matOne.col_ == matTwo.col_))
+        return true;
+    else
+        return false;
+}
+
+template <typename T>
+bool operator==(const Matrix2D<T> & leftMat, const Matrix2D<T> & rightMat) {
+
+    bool vecEqual{true};
+    if (!sameShape(leftMat, rightMat))
+        return false;
+    else {
+    for (std::size_t row = 0; row < leftMat.ow_; ++row) {
+        if (!std::equal(leftMat.matrix_.at(row).begin(), leftMat.matrix_.at(row).end(), rightMat.matrix_.at(row).begin(), binaryComparison)) {
+            vecEqual = false;
+            break;
+            }
+        }
+    }
+    return vecEqual;
+}
+
+template <typename U, typename W>
+bool operator==(const Matrix2D<U> & leftMat, const Matrix2D<W> & rightMat) {
+    
+    bool vecEqual{true};
+    if (!sameShape(leftMat, rightMat))
+        return false;
+    else {
+     for (std::size_t row = 0; row < leftMat.row_; ++row) {
+        if (!std::equal(leftMat.matrix_.at(row).begin(), leftMat.matrix_.at(row).end(), rightMat.matrix_.at(row).begin(), binaryComparison)) {
+            vecEqual = false;
+            break;
+            }
+        }       
+    }
+    return vecEqual;
+}
+
 
 template <typename T>
 Matrix2D<T> operator+(const Matrix2D<T> & T1, const Matrix2D<T> & T2) {
