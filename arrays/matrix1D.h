@@ -17,6 +17,8 @@ Matrix1D<T> operator+(const Matrix1D<T> &, const Matrix1D<T> &);
 template <typename T>
 Matrix1D<T> operator-(const Matrix1D<T> &, const Matrix1D<T> &);
 
+template <typename T>
+T normL2(const Matrix1D<T> &, const Matrix1D<T> &);
 
 template <typename T>
 class Matrix1D {
@@ -33,14 +35,18 @@ class Matrix1D {
         Matrix1D(std::vector<T>);
         ~Matrix1D() = default;
         T& operator() (std::size_t);
+        const T& operator()(std::size_t) const;
         void fillRandom(T, T);
         void swapRows(std::size_t, std::size_t);
+        void inputFromString(std::string);
         std::size_t getShape() {return size_;}
+        const std::size_t getShape() const {return size_;}
         friend std::ostream & operator<< <T> (std::ostream &, const Matrix1D<T> &);
         // math operator
         friend T dot <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend Matrix1D<T> operator+ <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend Matrix1D<T> operator- <T> (const Matrix1D<T> &, const Matrix1D<T> &);
+        friend T normL2 <T> (const Matrix1D<T> &, const Matrix1D<T> &);
 };
 
 template <typename T>
@@ -55,6 +61,11 @@ Matrix1D<T>::Matrix1D(std::vector<T> vec):matrix_{std::move(vec)} {
 
 template <typename T>
 T& Matrix1D<T>::operator() (std::size_t index) {
+    return matrix_.at(index);
+}
+
+template <typename T>
+const T& Matrix1D<T>::operator() (std::size_t index) const {
     return matrix_.at(index);
 }
 
@@ -90,9 +101,9 @@ std::ostream& operator<<(std::ostream & outStream, const Matrix1D<T> & mat) {
 } 
 
 template <typename T>
-T dot(const Matrix2D<T> & matOne, const Matrix1D<T> & matTwo) {
+T dot(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
     T init{T(0)};
-    std::inner_product(matOne.matrix_.begin(), matOne.matrix_.end(), matTwo.matrix_.begin(), init);
+    init = std::inner_product(matOne.matrix_.begin(), matOne.matrix_.end(), matTwo.matrix_.begin(), init);
     return init;
 }
 
@@ -110,5 +121,24 @@ Matrix1D<T> operator-(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
     return minusResults;    
 }
 
+template <typename T>
+T normL2(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
+    Matrix1D<T> distMat(matOne.size_);
+    T dotProd{T(0)};
+    distMat = matOne - matTwo;
+    dotProd = dot(distMat, distMat);
+    return ::sqrt(dotProd);
+}
+
+
+template <typename T>
+void Matrix1D<T>::inputFromString(std::string inputString) {
+    T inDigit{T()};
+    std::size_t rowIdx{0};
+    std::stringstream inStr(inputString);
+    while (inStr >> inDigit) {
+        matrix_.at(rowIdx++) = inDigit;
+    }
+}
 
 # endif 

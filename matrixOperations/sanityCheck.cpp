@@ -5,6 +5,7 @@
 # include "../arrays/arrayND.h"
 # include "../linearSystems/luSolvers.h"
 # include "../linearSystems/choleskyDecomposition.h"
+# include "../linearSystems/jacobi.h"
 # include "../utils/tester.h" 
 
 
@@ -71,6 +72,19 @@ int main() {
     std::cout <<"testing tester class "<<std::endl;
     TestFunction<std::pair<bool, Matrix2D<double>>, Matrix2D<double>, Matrix2D<double>> testThis(cholTest, &choleskyDecomposition<double>);
     testThis.addFixture("../testFixtures/cholesky3by3.dat", 3, 3);
+
+    std::cout <<" testing jacobi method " <<std::endl;
+    Matrix2D<double> jacTestA(3,3);
+    Matrix1D<int> jacTestb(3);
+    Matrix1D<double> jacTestRes(3);
+    jacTestA.inputFromString("5 -2 3 -3 9 1 2 -1 -7");
+    std::cout <<jacTestA<<std::endl;
+    jacTestb.inputFromString("-1 2 3");
+    std::cout << jacTestb <<std::endl;
+    jacTestRes = jacobi(jacTestA, jacTestb, 1000);
+
+    std::cout <<jacTestRes <<std::endl;
+
 
     return 0;
 }

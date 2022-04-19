@@ -85,10 +85,10 @@ class Matrix2D {
         template <typename U, typename W>
         friend bool operator==(const Matrix2D<U> &, const Matrix2D<W> &);
 
-        friend bool sameShape(const Matrix2D<T> &, const Matrix2D<T> &);
+        friend bool sameShape <T> (const Matrix2D<T> &, const Matrix2D<T> &);
 
         template <typename U, typename W>
-        friend bool sameShape(const Matrix2D<U> &, const Matrix2D<W> &);
+        friend bool sameShape (const Matrix2D<U> &, const Matrix2D<W> &);
 
         // +
         friend Matrix2D<T> operator+ <T> (const Matrix2D<T> &, const Matrix2D<T> &);
@@ -115,6 +115,7 @@ class Matrix2D {
         friend std::ostream& operator<< <T> (std::ostream &, const Matrix2D<T> &);  
 
         T& operator() (std::size_t i, std::size_t j); 
+        const T& operator()(std::size_t, std::size_t) const;
         std::vector<T> values() const;
         const std::vector< std::vector<T> > & getConstMatrix() const {return matrix_;}  
         std::vector< std::vector<T> > & getMutableMatrix() {return matrix_;}
@@ -126,7 +127,7 @@ class Matrix2D {
         //  auto adjoint();
         T det(std::string flag = "recursive");
         virtual T sum();
-        std::tuple<std::size_t, std::size_t> getShape() const {return std::make_tuple(row_, col_);}
+        std::tuple<std::size_t, std::size_t> getShape() const {return std::make_pair(row_, col_);}
         bool isSquare() const;
         bool isSymmetric() const;
         void fill(T);
@@ -180,6 +181,11 @@ void Matrix2D<T>::fill(T value) {
 
 template <typename T>
 T& Matrix2D<T>::operator()(std::size_t i, std::size_t j) {
+    return matrix_.at(i).at(j);
+}
+
+template <typename T>
+const T& Matrix2D<T>::operator()(std::size_t i, std::size_t j) const {
     return matrix_.at(i).at(j);
 }
 
