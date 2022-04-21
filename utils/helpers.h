@@ -5,6 +5,7 @@
 // array multiplier
 // works for any container that supports size()
 // helper works with containers of same types
+
 template <typename CONT>
 void matrixMultiply(const CONT & matOne, const CONT & matTwo, CONT & results) {
 

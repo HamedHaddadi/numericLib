@@ -21,6 +21,15 @@ template <typename T>
 T normL2(const Matrix1D<T> &, const Matrix1D<T> &);
 
 template <typename T>
+bool sameShape(const Matrix1D<T> &, const Matrix1D<T> &);
+
+template <typename U, typename W>
+bool sameShape(const Matrix1D<U> &, const Matrix1D<W> &);
+
+template <typename U, typename W>
+bool operator==(const Matrix1D<U> &, const Matrix1D<W> &);
+
+template <typename T>
 class Matrix1D {
     private:
         std::size_t size_{0};
@@ -47,6 +56,11 @@ class Matrix1D {
         friend Matrix1D<T> operator+ <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend Matrix1D<T> operator- <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend T normL2 <T> (const Matrix1D<T> &, const Matrix1D<T> &);
+        friend bool sameShape <T> (const Matrix1D<T> &, const Matrix1D<T> &);
+        template <typename U, typename W>
+        friend bool sameShape (const Matrix1D<U> &, const Matrix1D<W> &);
+        template <typename U, typename W>
+        friend bool operator==(const Matrix1D<U> &, const Matrix1D<W> &);
 };
 
 template <typename T>
@@ -130,7 +144,6 @@ T normL2(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
     return ::sqrt(dotProd);
 }
 
-
 template <typename T>
 void Matrix1D<T>::inputFromString(std::string inputString) {
     T inDigit{T()};
@@ -139,6 +152,37 @@ void Matrix1D<T>::inputFromString(std::string inputString) {
     while (inStr >> inDigit) {
         matrix_.at(rowIdx++) = inDigit;
     }
+}
+
+template <typename T>
+bool sameShape(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
+    if (matOne.size_ == matTwo.size_)
+        return true;
+    else
+        return false;
+}
+
+template <typename U, typename W>
+bool sameShape(const Matrix1D<U> & matOne, const Matrix1D<W> & matTwo) {
+    if (matOne.size_ == matTwo.size_)
+        return true;
+    else
+        return false;
+}
+
+template <typename U, typename W>
+bool operator==(const Matrix1D<U> & matOne, const Matrix1D<W> & matTwo) {
+    bool shapeEqual{true};
+    bool elemEqual{false};
+    if (!sameShape(matOne, matTwo)) {
+        shapeEqual = false;
+    }
+    elemEqual = std::equal(matOne.matrix_.begin(), matOne.matrix_.end(), matTwo.matrix_.begin(), binaryComparison);
+
+    if (elemEqual && shapeEqual)
+        return true;
+    else
+        return false;
 }
 
 # endif 

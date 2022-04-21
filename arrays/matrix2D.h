@@ -130,6 +130,7 @@ class Matrix2D {
         std::tuple<std::size_t, std::size_t> getShape() const {return std::make_pair(row_, col_);}
         bool isSquare() const;
         bool isSymmetric() const;
+        bool isDiagonalDominant() const;
         void fill(T);
         void fillRandom(T, T);
         void inputFromString(std::string);
@@ -546,6 +547,23 @@ bool Matrix2D<T>::isSymmetric() const {
             if (matrix_.at(i).at(j) != matrix_.at(j).at(i)) 
                 is_sym = false;
     return is_sym;
+}
+
+template <typename T>
+bool Matrix2D<T>::isDiagonalDominant() const {
+    bool isDominant{true};
+    T sumCol{T()};
+    std::size_t row, col;
+    for (row = 0; row < row_; ++row) {
+        for (col = 0; col < col_; ++col) {
+            sumCol += std::fabs(matrix_.at(row).at(col));
+        }
+        if (!(std::fabs(matrix_.at(row).at(col)) >= sumCol)) {
+            isDominant = false;
+            break;
+        }
+    }
+    return isDominant;
 }
 
 template<typename T>
