@@ -4,6 +4,7 @@
 # include "../utils/header.h"
 # include "../utils/helpers.h"
 # include "../arrays/matrix2D.h"
+# include "../utils/concepts.h"
 
 template <typename T1, typename T2>
 void computeLU(std::vector< std::vector<T1> > & L, std::vector< std::vector<T1> > & U, 
@@ -61,7 +62,7 @@ auto doolittleLUDecomposition(Matrix2D<T> & matrix) {
 // Gauss Elimination for Ax = b solution //
 
 template <typename T>
-requires std::is_floating_point<T>::value
+requires std::is_floating_point<T>::value && TwoD<Matrix2D<T>> && OneD<Matrix1D<T>>
 std::pair<Matrix2D<T>, Matrix1D<T>> gaussianElimination(Matrix2D<T> A, Matrix1D<T> b) {
     std::size_t size = std::get<0>(A.getShape());
     std::size_t pivotIndex;
@@ -83,7 +84,7 @@ std::pair<Matrix2D<T>, Matrix1D<T>> gaussianElimination(Matrix2D<T> A, Matrix1D<
             b(k) -= A(k, j)*b(j);
         b(k) = b(k)/A(k,k);
     }
-    
+
     return std::make_pair(A, b);
 }
 

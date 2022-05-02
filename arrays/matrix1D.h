@@ -2,6 +2,7 @@
 # define MATRIX1D_HH_
 
 # include "../utils/header.h"
+# include "../utils/concepts.h"
 
 template <typename T> class Matrix1D;
 
@@ -17,8 +18,18 @@ Matrix1D<T> operator+(const Matrix1D<T> &, const Matrix1D<T> &);
 template <typename T>
 Matrix1D<T> operator-(const Matrix1D<T> &, const Matrix1D<T> &);
 
+// norms
 template <typename T>
-T normL2(const Matrix1D<T> &, const Matrix1D<T> &);
+T normInfty(const Matrix1D<T> &);
+
+template <typename T>
+T norm1(const Matrix1D<T> &);
+
+template <typename T>
+T norm2(const Matrix1D<T> &);
+
+template <typename T>
+T euclidean(const Matrix1D<T> &, const Matrix1D<T> &);
 
 template <typename T>
 bool sameShape(const Matrix1D<T> &, const Matrix1D<T> &);
@@ -48,6 +59,9 @@ class Matrix1D {
         void fillRandom(T, T);
         void swapRows(std::size_t, std::size_t);
         void inputFromString(std::string);
+        T norm1();
+        T norm2();
+        T normInfty();
         std::size_t getShape() {return size_;}
         const std::size_t getShape() const {return size_;}
         friend std::ostream & operator<< <T> (std::ostream &, const Matrix1D<T> &);
@@ -55,12 +69,16 @@ class Matrix1D {
         friend T dot <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend Matrix1D<T> operator+ <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend Matrix1D<T> operator- <T> (const Matrix1D<T> &, const Matrix1D<T> &);
-        friend T normL2 <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         friend bool sameShape <T> (const Matrix1D<T> &, const Matrix1D<T> &);
         template <typename U, typename W>
         friend bool sameShape (const Matrix1D<U> &, const Matrix1D<W> &);
         template <typename U, typename W>
         friend bool operator==(const Matrix1D<U> &, const Matrix1D<W> &);
+        // Norms
+        friend T normInfty <T> (const Matrix1D<T> &);
+        friend T norm1 <T> (const Matrix1D<T> &);
+        friend T norm2 <T> (const Matrix1D<T> &);
+        friend T euclidean <T> (const Matrix1D<T> &, const Matrix1D<T> &);
 };
 
 template <typename T>
@@ -97,6 +115,34 @@ void Matrix1D<T>::fillRandom(T min, T max) {
         for (std::size_t i = 0; i < size_; i++)
             matrix_.at(i) = dist(engine);
     }               
+}
+
+// norms
+template <typename T>
+T Matrix1D<T>::norm1() {
+    T normValue{T()};
+    std::for_each(matrix_.begin(), matrix_.end(), [&](T elem) {
+        normValue += std::abs(elem);
+    });
+    return normValue;
+}
+
+template <typename T>
+T Matrix1D<T>::norm2() {
+    T normValue{T()};
+    normValue = std::inner_product(matrix_.begin(), matrix_.end(), matrix_.begin(), normValue);
+    return ::sqrt(normValue);
+}
+
+template <typename T>
+T Matrix1D<T>::normInfty() {
+    T maxValue = std::numeric_limits<T>::min();
+    std::for_each(matrix_.begin(), matrix_.end(), [&](T elem){
+        if (std::abs(elem) >= maxValue) {
+            maxValue = std::abs(elem);
+        }
+    });
+    return maxValue;
 }
 
 template <typename T>
@@ -136,7 +182,32 @@ Matrix1D<T> operator-(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
 }
 
 template <typename T>
-T normL2(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
+T normInfty(const Matrix1D<T> & matrix) {
+    T maxValue = std::numeric_limits<T>::min();
+    std::for_each(matrix.begin(), matrix.end(), [&](T elem) {
+        if (std::abs(elem) >= maxValue) {
+            maxValue = std::abs(elem);
+        }
+    });
+    return maxValue;
+}
+
+template <typename T>
+T norm1(const Matrix1D<T> & matrix) {
+    T normValue{T()};
+    normValue = std::for_each(matrix.begin(), matrix.end(), [&](T elem) {normValue += std::abs(elem);});
+    return normValue;
+}
+
+template <typename T>
+T norm2(const Matrix1D<T> & matOne) {
+    T normValue{T()};
+    normValue = dot(matOne, matOne);
+    return ::sqrt(normValue);
+}
+
+template <typename T>
+T euclidean(const Matrix1D<T> & matOne, const Matrix1D<T> & matTwo) {
     Matrix1D<T> distMat(matOne.size_);
     T dotProd{T(0)};
     distMat = matOne - matTwo;
@@ -178,7 +249,6 @@ bool operator==(const Matrix1D<U> & matOne, const Matrix1D<W> & matTwo) {
         shapeEqual = false;
     }
     elemEqual = std::equal(matOne.matrix_.begin(), matOne.matrix_.end(), matTwo.matrix_.begin(), binaryComparison);
-
     if (elemEqual && shapeEqual)
         return true;
     else

@@ -56,6 +56,17 @@ std::ofstream& operator<<(std::ofstream &, const Matrix2D<T> &);
 template <typename T>
 std::ostream&  operator<<(std::ostream &, const Matrix2D<T> &);
 
+// matrix norms
+template <typename T>
+T norm2(const Matrix2D<T> &);
+
+template <typename T>
+T euclidean(const Matrix2D<T> &, const Matrix2D<T> &);
+
+// useful helper methods
+template <typename T>
+T sumElements(const Matrix2D<T> &);
+
 // Class declarations
 template <typename T>
 class Matrix2D {
@@ -113,6 +124,11 @@ class Matrix2D {
         // input/output friends
         friend std::ofstream& operator<< <T> (std::ofstream &, const Matrix2D<T> &);
         friend std::ostream& operator<< <T> (std::ostream &, const Matrix2D<T> &);  
+
+        // norms
+        friend T norm2 <T> (const Matrix2D<T> &);
+        friend T euclidean <T> (const Matrix2D<T> &, const Matrix2D<T> &);
+        friend T sumElements <T> (const Matrix2D<T> &);
 
         T& operator() (std::size_t i, std::size_t j); 
         const T& operator()(std::size_t, std::size_t) const;
@@ -441,8 +457,7 @@ void strassen(const Matrix2D<U> & matOne, const Matrix2D<W> & matTwo, Matrix2D<s
             C.at(i).at(col/2 + j) = C12.at(i).at(j);
             C.at(row/2 + i).at(j) = C21.at(i).at(j);
             C.at(row/2 + i).at(col/2 + j) = C22.at(i).at(j);
-        }
-    
+        } 
     results.matrix_ = C;
 }
 
@@ -458,7 +473,6 @@ Matrix2D<std::common_type_t<U, W>> operator*(const Matrix2D<U> & matOne, const M
     }
     return results;
 }
-
 
 // input/output operations
 template<typename T>
@@ -482,10 +496,38 @@ std::ostream& operator<<(std::ostream & outStream, const Matrix2D<T> & T1) {
             if (col == T1.col_ - 1)
                 outStream<<std::endl;
         }
- 
     return outStream;
 }
 
+// norms
+
+// useful helpers
+template <typename T>
+T sumElements(const Matrix2D<T> & matrix) {
+    T sumValue{T()};
+    std::for_each(matrix.matrix_.begin(), matrix.matrix_.end(), [& sumValue](typename Matrix2D<T>::rowIter_ row) {
+            std::for_each(row -> begin(), row -> end(), [&](typename Matrix2D<T>::colIter_ col) {
+            sumValue += *col;
+        });
+    }); 
+    return sumValue; 
+}
+
+template <typename T>
+T norm2(const Matrix2D<T> & matrix) {
+    T sumElems{T()};
+    sumElems = sumElements(matrix);
+    return ::sqrt(sumElems);
+}
+
+template <typename T>
+T euclidean (const Matrix2D<T> & matOne, const Matrix2D<T> & matTwo) {
+    Matrix2D<T> distMatrix(matOne.row_, matOne.col_);
+    distMatrix = matOne - matTwo;
+    T sumElems{T()};
+    sumElems = sumElements(distMatrix);
+    return ::sqrt(sumElems); 
+}
 
 // other class methods
 template <typename T>

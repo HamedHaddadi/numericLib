@@ -117,4 +117,10 @@ bool binaryComparison(U elemOne, W elemTwo) {
         return false;
 }
 
+// dot product between two linearized arrays (or vectors)
+
+
+
+
+
 # endif 
