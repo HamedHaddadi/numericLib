@@ -61,7 +61,13 @@ template <typename T>
 T norm2(const Matrix2D<T> &);
 
 template <typename T>
+T norm1(const Matrix2D<T> &);
+
+template <typename T>
 T euclidean(const Matrix2D<T> &, const Matrix2D<T> &);
+
+template <typename T>
+T normInf(const Matrix2D<T> &);
 
 // useful helper methods
 template <typename T>
@@ -127,6 +133,8 @@ class Matrix2D {
 
         // norms
         friend T norm2 <T> (const Matrix2D<T> &);
+        friend T norm1 <T> (const Matrix2D<T> &);
+        friend T normInf <T> (const Matrix2D<T> &);
         friend T euclidean <T> (const Matrix2D<T> &, const Matrix2D<T> &);
         friend T sumElements <T> (const Matrix2D<T> &);
 
@@ -499,7 +507,6 @@ std::ostream& operator<<(std::ostream & outStream, const Matrix2D<T> & T1) {
     return outStream;
 }
 
-// norms
 
 // useful helpers
 template <typename T>
@@ -518,6 +525,38 @@ T norm2(const Matrix2D<T> & matrix) {
     T sumElems{T()};
     sumElems = sumElements(matrix);
     return ::sqrt(sumElems);
+}
+
+template <typename T>
+T norm1(const Matrix2D<T> & matrix) {
+    std::vector<T> sumCols;
+    T sumValue{T()};
+    for (const auto & row: matrix.matrix_) {
+        sumValue = T(0);
+        for (const auto & col: row) {
+            sumValue += col;
+        }
+        sumCols.push_back(sumValue);
+    }
+    T normOne = *max_elemen(sumCols.begin(), sumCols.end());
+    return normOne;
+}
+
+
+template <typename T>
+T normInf(const Matrix2D<T> & matrix) {
+    std::vector<T> sumRows;
+    T sumValue{T()};
+    std::for_each(matrix.matrix_.begin(), matrix.matrix_.end(), [& sumRows](typename Matrix2D<T>::rowIter_ row) {
+        sumValue = T(0);
+        std::for_each(row -> begin(), row -> end(), [&](typename Matrix2D<T>::colIter_ col) {
+            sumValue += std::abs(*col);
+        });
+        sumRows.push_back(sumValue);
+    });
+
+    T maxValue = *max_element(sumRows.begin(), sumRows.end());
+    return maxValue;
 }
 
 template <typename T>
