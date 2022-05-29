@@ -88,4 +88,47 @@ std::pair<Matrix2D<T>, Matrix1D<T>> gaussianElimination(Matrix2D<T> A, Matrix1D<
     return std::make_pair(A, b);
 }
 
+// thomas algorithm
+template <typename T>
+void linearLU(std::unique_ptr<std::vector<std::vector<T>>> & myMatrix,
+                    std::vector<T> & dVec, std::vector<T> & uVec, std::vector<T> & lVec,
+                         std::size_t rowSize) {
+
+    dVec.at(0) = myMatrix -> at(0).at(0);
+    uVec.at(0) = myMatrix -> at(0).at(1);
+    for (std::size_t row =0; row < rowSize - 2; ++row) {
+        lVec.at(row) = myMatrix -> at(row).at(row - 1)/dVec.at(row);
+        dVec.at(row + 1) = myMatrix -> at(row + 1).at(row + 1) - lVec.at(row)*uVec.at(row);
+        uVec.at(row + 1) = myMatrix -> at(row + 1).at(row + 1);
+    }
+
+    lVec.at(rowSize - 2) = myMatrix -> at(rowSize - 2).at(rowSize - 3);
+    dVec.at(rowSize - 1) = myMatrix -> at(rowSize - 1).at(rowSize - 1) - lVec.at(rowSize - 2)*uVec.at(rowSize - 2);
+
+}
+
+
+template <typename T>
+requires std::is_floating_point<T>::value && TwoD<Matrix2D<T>> && OneD<Matrix2D<T>>
+Matrix1D<T> thomasAlgorithm(Matrix2D<T> A, Matrix1D<T> b) {
+    std::size_t rowSize = std::get<0>(A.getShape());
+    std::unique_ptr<std::vector<std::vector<T>>> myMatrix =  A.getCopyPtrMatrix();
+    std::vector<T> dVec(rowSize, T());
+    std::vector<T> uVec(rowSize, T());
+    std::vector<T> lVec(rowSize, T());
+    std::vector<T> yVec(rowSize, T());
+    std::vector<T> xVec(rowSize, T());
+    linearLU(myMatrix, dVec, uVec, lVec, rowSize);
+    yVec.at(0) = b(0);
+    for (std::size_t row = 1; row < rowSize; ++row)
+        yVec.at(row) = b(row) - lVec.at(row - 1)*yVec.at(row - 1);
+    
+    xVec.at(rowSize - 1) = yVec.at(rowSize - 1)/dVec.at(rowSize - 1);
+    for (std::size_t row = rowSize - 2; row >= 0; row--)
+        xVec.at(row) = (yVec.at(row) - uVec.at(row)*xVec.at(row + 1))/dVec.at(row);
+    Matrix1D<T> qMatrix(xVec);
+    return qMatrix;
+}
+
+
 # endif 

@@ -64,6 +64,8 @@ class Matrix1D {
         T normInfty();
         std::size_t getShape() {return size_;}
         const std::size_t getShape() const {return size_;}
+        void setMatrix(std::vector<T> &);
+        void setMatrix(std::vector<T> &&);
         friend std::ostream & operator<< <T> (std::ostream &, const Matrix1D<T> &);
         // math operator
         friend T dot <T> (const Matrix1D<T> &, const Matrix1D<T> &);
@@ -254,5 +256,19 @@ bool operator==(const Matrix1D<U> & matOne, const Matrix1D<W> & matTwo) {
     else
         return false;
 }
+
+
+template <typename T>
+void Matrix1D<T>::setMatrix(std::vector<T> & newMatrix) {
+    size_ = newMatrix.size();
+    matrix_ = newMatrix;
+}
+
+template <typename T>
+void Matrix1D<T>::setMatrix(std::vector<T> && newMatrix) {
+    size_ = newMatrix.size();
+    matrix_ = newMatrix;
+}
+
 
 # endif 

@@ -80,7 +80,9 @@ class Matrix2D {
     protected:
         std::size_t row_{0}, col_{0};
         std::vector< std::vector<T> > matrix_;
-        typedef typename std::vector< std::vector<T> >::iterator rowIter_;
+        using Vec2D = std::vector< std::vector<T>>;
+        using Vec1D = std::vector<T>;
+        typedef typename std::vector< std::vector<T>>::iterator rowIter_;
         typedef typename std::vector<T>::iterator colIter_;    
 
     public:
@@ -155,11 +157,13 @@ class Matrix2D {
         bool isSquare() const;
         bool isSymmetric() const;
         bool isDiagonalDominant() const;
+        bool isTridiagonal() const;
         void fill(T);
         void fillRandom(T, T);
         void inputFromString(std::string);
         // non-static utilities
         void swapRows(int, int);
+        void reshape(std::size_t, std::size_t);
         std::size_t maxInColIndex(std::size_t);
         // static methods 
         static T recursiveDeterminant(const std::vector<std::vector<T> > &, std::size_t);
@@ -647,7 +651,34 @@ bool Matrix2D<T>::isDiagonalDominant() const {
     return isDominant;
 }
 
-template<typename T>
+
+template <typename T>
+bool Matrix2D<T>::isTridiagonal() const {
+
+    if (!isSquare(matrix_))
+        throw LibException("the matrix is not a square matrix to check Tridiagonality");  
+      
+    bool isTri{true};
+    if ((matrix_.at(0).at(0) == 0) || (matrix_.at(0).at(1) == 0)) {
+        return false;
+    }
+    if ((matrix_.at(row_ - 1).at(col_ - 2)) || (matrix_.at(row_ - 1).at(col_ - 1))) {
+        return false;
+    }
+    else {
+    for (std::size_t row = 1; row < row_ - 1; ++row) {
+        if ((matrix_.at(row).at(row - 1) == 0) ||
+                 (matrix_.at(row).at(row) == 0) ||
+                     (matrix_.at(row).at(row + 1) == 0)) {
+            return false;
+            }
+        }
+    }
+    return isTri;
+}
+
+
+template <typename T>
 void Matrix2D<T>::fillRandom(T min, T max) {
     std::random_device seeder;
     std::mt19937 engine(seeder());
@@ -764,6 +795,20 @@ void Matrix2D<T>::swapRows(int rowOne, int rowTwo) {
     std::advance(rowOneIt, rowOne);
     std::advance(rowTwoIt, rowTwo);
     std::swap_ranges(rowOneIt -> begin(), rowOneIt -> end(), rowTwoIt -> begin());
+}
+
+
+template <typename T>
+void Matrix2D<T>::reshape(std::size_t row, std::size_t col) {
+    Matrix2D<T>::Vec2D new_matrix(row, Vec1D(col, T()));
+
+    for (std::size_t row = 0; row < row_; ++row) {
+        for (std::size_t col = 0; col < col_; ++col) {
+            new_matrix.at(col).at(row) = matrix_.at(row).at(col);
+        }
+    }
+    std::swap(matrix_, new_matrix);
+    new_matrix.clear();
 }
 
 template <typename T>

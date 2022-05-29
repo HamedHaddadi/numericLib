@@ -7,6 +7,7 @@
 # include <tuple>
 # include <utility>
 # include <stdexcept>
+# include <stdlib.h>
 # include <numeric>
 # include <type_traits>
 # include <concepts>
@@ -22,6 +23,7 @@
 # include <chrono>
 # include <functional>
 # include <limits>
+# include <exception>
 # include "timer.h"
 
 # define USE_TIMER true

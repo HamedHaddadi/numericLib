@@ -1,6 +1,7 @@
 # ifndef HELPERS_H_
 # define HELPERS_H_
 # include "./header.h"
+# include "./concepts.h"
 
 // array multiplier
 // works for any container that supports size()
@@ -117,7 +118,29 @@ bool binaryComparison(U elemOne, W elemTwo) {
         return false;
 }
 
-// dot product between two linearized arrays (or vectors)
+// check to see the ccontainers are square vectors
+template <typename T>
+requires isVector<T>
+bool isSquare(T vec) {
+    if (vec.size() == vec.at(0).size())
+        return true;
+    else
+        return false;
+}
+
+
+class LibException: public std::exception {
+    private:
+        const char * message_;
+    public:
+        LibException(const char * msg):message_{msg}{}
+        const char* what() const noexcept override {
+            return message_;
+        }
+};
+
+
+
 
 
 
